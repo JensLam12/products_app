@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:products_app/providers/login_form_provider.dart';
-import 'package:products_app/services/notifications_service.dart';
+import 'package:products_app/services/services.dart';
 import 'package:products_app/ui/input_decorations.dart';
 import 'package:products_app/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../services/services.dart';
-
-class LoginScreen extends StatelessWidget {
+class RegisterScreen extends StatelessWidget {
    
-	const LoginScreen({Key? key}) : super(key: key);
+	const RegisterScreen({Key? key}) : super(key: key);
 	
 	@override
 	Widget build(BuildContext context) {
@@ -23,7 +21,7 @@ class LoginScreen extends StatelessWidget {
 								child: Column(
 									children: [
 										const SizedBox( height: 10 ),
-										Text( 'Login', style: Theme.of(context).textTheme.headline4 ),
+										Text( 'Create account', style: Theme.of(context).textTheme.headline4 ),
 										const SizedBox( height: 30 ),
 										ChangeNotifierProvider(
 											create: ( _ ) => LoginFormProvider(),
@@ -34,12 +32,12 @@ class LoginScreen extends StatelessWidget {
 							),
 							const SizedBox( height: 40 ),
 							TextButton(
-								onPressed: () => Navigator.pushReplacementNamed(context, 'register'), 
+								onPressed: () => Navigator.pushReplacementNamed(context, 'login'), 
 								style: ButtonStyle(
 									overlayColor: MaterialStateProperty.all( Colors.indigo.withOpacity(0.1)),
 									shape: MaterialStateProperty.all( const StadiumBorder() )
 								),
-								child: const Text('Create a new account', style: TextStyle( fontSize: 18, color: Colors.black87)),
+								child: const Text('Login', style: TextStyle( fontSize: 18, color: Colors.black87 )),
 							),
               				const SizedBox( height: 40 ),
 						],
@@ -103,7 +101,7 @@ class _LoginForm extends StatelessWidget {
 							child: Container(
 								padding: const EdgeInsets.symmetric( horizontal: 90, vertical: 15),
 								child: Text(
-								loginForm.isLoading ? 'Wait' : 'Login',
+								loginForm.isLoading ? 'Wait' : 'Register',
 								style: const TextStyle( color: Colors.white),
 								),
 							),
@@ -117,15 +115,16 @@ class _LoginForm extends StatelessWidget {
 								loginForm.isLoading = true;
 
 								//await Future.delayed( const Duration(seconds: 2));
-								final String? errorMessage = await authService.login( loginForm.email, loginForm.password );
+								final String? errorMessage = await authService.createUser( loginForm.email, loginForm.password );
 
 								if( errorMessage == null) {
 									Navigator.pushReplacementNamed(context, 'home');
-								} else {
+								}else {
 									NotificationsService.showSnackbar(errorMessage);
 								}
 
 								loginForm.isLoading = false;
+								
 							},
 						)
 					],

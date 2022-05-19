@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:products_app/models/models.dart';
 
 class ProductCard extends StatelessWidget {
-	const ProductCard({Key? key}) : super(key: key);
+	final Product product;
+
+	const ProductCard({Key? key, required this.product}) : super(key: key);
 
 	@override
 	Widget build(BuildContext context) {
@@ -14,19 +17,20 @@ class ProductCard extends StatelessWidget {
 				decoration: _DecorationCardBorder(),
 				child: Stack(
 					alignment: Alignment.bottomLeft,
-					children: const [
-						_BackgroundImage(),
-						_ProductDetails(),
+					children: [
+						_BackgroundImage(url: product.picture ),
+						_ProductDetails( name: product.name, id: product.id! ),
 						Positioned(
 							top: 0,
 							right: 0,
-							child: _PriceTag()
+							child: _PriceTag( price: product.price)
 						),
-						Positioned(
-							top: 0,
-							left: 0,
-							child: _NotAvailable()
-						)
+						if(!product.available)
+							const Positioned(
+								top: 0,
+								left: 0,
+								child: _NotAvailable()
+							)
 					],
 				),
 			),
@@ -46,11 +50,12 @@ class ProductCard extends StatelessWidget {
 	);
 }
 
-
-
 class _BackgroundImage extends StatelessWidget {
+	final String? url;
+
 	const _BackgroundImage({
-		Key? key,
+		Key? key, 
+		this.url,
 	}) : super(key: key);
 
 	@override
@@ -60,19 +65,30 @@ class _BackgroundImage extends StatelessWidget {
 			child: Container(
 				width: double.infinity,
 				height: 400,
-				child: const FadeInImage(
-					placeholder: AssetImage('Assets/jar-loading.gif'),
-					image: NetworkImage( 'https://via.placeholder.com/400x300/f6f6f6' ),
-					fit: BoxFit.cover,
-				),
+				child: url == null 
+					? const Image(
+						image: AssetImage( 'Assets/no-image.png'),
+						fit: BoxFit.cover,
+					)	 
+					: FadeInImage(
+						placeholder: const AssetImage('Assets/jar-loading.gif'),
+						image: NetworkImage( url! ),
+						fit: BoxFit.cover,
+					)
+				,
 			),
 		);
 	}
 }
 
 class _ProductDetails extends StatelessWidget {
+	final String name;
+	final String id;
+	
 	const _ProductDetails({
-		Key? key,
+		Key? key, 
+		required this.name, 
+		required this.id,
 	}) : super(key: key);
 
 	@override
@@ -86,16 +102,16 @@ class _ProductDetails extends StatelessWidget {
 				decoration: _BuildBoxDecoration(),
 				child: Column(
 					crossAxisAlignment: CrossAxisAlignment.start,
-					children: const [
+					children: [
 						Text(
-							'Hard drive', 
-							style: TextStyle( fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), 
+							name, 
+							style: const TextStyle( fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold), 
 							maxLines: 1, 
 							overflow: TextOverflow.ellipsis 
 						),
 						Text(
-							'Hard drive Id', 
-							style: TextStyle( fontSize: 15, color: Colors.white ), 
+							id,
+							style: const TextStyle( fontSize: 15, color: Colors.white ), 
 							
 						)
 					],
@@ -111,8 +127,11 @@ class _ProductDetails extends StatelessWidget {
 }
 
 class _PriceTag extends StatelessWidget {
+	final double price;
+
 	const _PriceTag({
-		Key? key,
+		Key? key, 
+		required this.price,
 	}) : super(key: key);
 
 	@override
@@ -125,11 +144,11 @@ class _PriceTag extends StatelessWidget {
 				borderRadius: BorderRadius.only( topRight: Radius.circular(25), bottomLeft: Radius.circular(25))
 			),
 			alignment: Alignment.center,
-			child: const FittedBox(
+			child: FittedBox(
 				fit: BoxFit.contain,
 				child: Padding(
-					padding: EdgeInsets.symmetric( horizontal: 10),
-					child: Text('\$103333.99', style: TextStyle( color: Colors.white, fontSize: 20))
+					padding: const EdgeInsets.symmetric( horizontal: 10),
+					child: Text( "\$ $price" , style: const TextStyle( color: Colors.white, fontSize: 20))
 				),
 			),
 		);
@@ -147,7 +166,7 @@ class _NotAvailable extends StatelessWidget {
 			width: 100,
 			height: 70,
 			decoration: const BoxDecoration(
-				color: Colors.yellow,
+				color: Colors.orange,
 				borderRadius: BorderRadius.only( topLeft: Radius.circular(25), bottomRight: Radius.circular(25) )
 			),
 			child: const FittedBox(
